@@ -25,7 +25,11 @@ jobs:
           client-id: 68aa1abc-1155-46c5-8a9f-643d1f80de92
           tenant-id: a0b91e36-516f-4b1d-8d58-feb227b32a8d
           subscription-id: 47f00bc6-c0a2-4ef3-8447-b76762fcc0ce
-            
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+           terraform_version: 1.9.5
+           
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
@@ -75,4 +79,5 @@ jobs:
         continue-on-error: true
         working-directory: environments/dev              
           
+
 
