@@ -13,69 +13,48 @@ permissions:
   contents: read
   
 jobs: 
-  terraform-init-plan:
+  terraform-deploy:
     runs-on: ubuntu-latest
+    environment: dev
+    if: github.ref == 'refs/heads/main'
+
     steps: 
       - name: Checkout
         uses: actions/checkout@v5.0.0
-    
-      - name: Azure Login
-        uses: azure/login@v2.3.0
-        with:
-          client-id: 68aa1abc-1155-46c5-8a9f-643d1f80de92
-          tenant-id: a0b91e36-516f-4b1d-8d58-feb227b32a8d
-          subscription-id: 47f00bc6-c0a2-4ef3-8447-b76762fcc0ce
-          
-      # ✅ Export Azure OIDC environment variables for Terraform
-      - name: Set Terraform Azure environment variables
-        run: |
-          echo "ARM_CLIENT_ID=68aa1abc-1155-46c5-8a9f-643d1f80de92" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=a0b91e36-516f-4b1d-8d58-feb227b32a8d" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=47f00bc6-c0a2-4ef3-8447-b76762fcc0ce" >> $GITHUB_ENV
-          echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
-          
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-           terraform_version: 1.9.5
-           
-      # Optional: Terraform fmt check
-      # - name: Terraform fmt
-      #   run: terraform fmt -check
-      #   continue-on-error: true
-      #   working-directory: environments/dev
-        
-      - name: Terraform Init
-        id: init
-        run: terraform init -input=false  
-        working-directory: environments/dev
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-        working-directory: environments/dev        
-      
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false
-        continue-on-error: true
-        working-directory: environments/dev    
-        
-  terraform-apply:    
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: terraform-init-plan
-    environment: dev
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5.0.0
-    
+      # 🔐 Azure Login using Federated Credentials
       - name: Azure Login
         uses: azure/login@v2.3.0
         with:
           client-id: ff27bcf6-f60c-4a57-8b01-8eee5de2a9cd
           tenant-id: 0f7010fd-209e-4344-8457-043ffb37143b
-          subscription-id: 1075ec7a-b17a-4f37-bf3f-9d68c4506dc1   
+          subscription-id: 1075ec7a-b17a-4f37-bf3f-9d68c4506dc1
 
-      # ✅ Export Azure OIDC environment variab
+      # ✅ Export Azure OIDC environment variables for Terraform
+      - name: Set Terraform Azure environment variables
+        run: |
+          echo "ARM_CLIENT_ID=ff27bcf6-f60c-4a57-8b01-8eee5de2a9cd" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=0f7010fd-209e-4344-8457-043ffb37143b" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=1075ec7a-b17a-4f37-bf3f-9d68c4506dc1" >> $GITHUB_ENV
+          echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: environments/dev
+
+      - name: Terraform Validate
+        run: terraform validate -no-color
+        working-directory: environments/dev
+
+      - name: Terraform Plan
+        run: terraform plan -no-color -input=false
+        working-directory: environments/dev
+
+      - name: Terraform Apply
+        run: terraform apply --auto-approve
+        working-directory: environments/dev
