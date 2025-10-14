@@ -78,7 +78,7 @@ jobs:
           echo "ARM_TENANT_ID=a0b91e36-516f-4b1d-8d58-feb227b32a8d" >> $GITHUB_ENV
           echo "ARM_SUBSCRIPTION_ID=47f00bc6-c0a2-4ef3-8447-b76762fcc0ce" >> $GITHUB_ENV
           echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
-
+          
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -94,5 +94,6 @@ jobs:
         run: terraform apply --auto-approve
         continue-on-error: true
         working-directory: environments/dev
+
 
 
