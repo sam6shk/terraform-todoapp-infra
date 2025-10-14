@@ -86,3 +86,68 @@ jobs:
       - name: Terraform Apply
         run: terraform apply --auto-approve
         working-directory: environments/dev
+
+
+# To run workflow in single job, comment above lines till line no: 88 and then uncomment below all lines till end
+# name: "Dev Terraform Workflow"
+
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#   push:
+#     branches:
+#       - main      
+
+# permissions:
+#   id-token: write
+#   contents: read
+  
+# jobs: 
+#   terraform-deploy:
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     # ⚠️ Removed `environment: dev` to simplify OIDC subject claim
+#     # If you still need environment protection or secrets, re-add it and make sure FIC matches!
+
+#     steps: 
+#       - name: Checkout
+#         uses: actions/checkout@v5.0.0
+
+#       # 🔐 Azure Login using Federated Credentials
+#       - name: Azure Login
+#         uses: azure/login@v2.3.0
+#         with:
+#           client-id: 68aa1abc-1155-46c5-8a9f-643d1f80de92  # ✅ Correct App Registration
+#           tenant-id: a0b91e36-516f-4b1d-8d58-feb227b32a8d   # ✅ Matches your tenant
+#           subscription-id: 47f00bc6-c0a2-4ef3-8447-b76762fcc0ce  # ✅ Confirmed subscription
+
+#       # ✅ Export Azure OIDC environment variables for Terraform
+#       - name: Set Terraform Azure environment variables
+#         run: |
+#           echo "ARM_CLIENT_ID=68aa1abc-1155-46c5-8a9f-643d1f80de92" >> $GITHUB_ENV
+#           echo "ARM_TENANT_ID=a0b91e36-516f-4b1d-8d58-feb227b32a8d" >> $GITHUB_ENV
+#           echo "ARM_SUBSCRIPTION_ID=47f00bc6-c0a2-4ef3-8447-b76762fcc0ce" >> $GITHUB_ENV
+#           echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
+
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: 1.9.5
+
+#       - name: Terraform Init
+#         run: terraform init -input=false
+#         working-directory: environments/dev
+
+#       - name: Terraform Validate
+#         run: terraform validate -no-color
+#         working-directory: environments/dev
+
+#       - name: Terraform Plan
+#         run: terraform plan -no-color -input=false
+#         working-directory: environments/dev
+
+#       - name: Terraform Apply
+#         run: terraform apply --auto-approve
+#         working-directory: environments/dev
+
