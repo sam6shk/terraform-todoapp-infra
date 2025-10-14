@@ -38,12 +38,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
            terraform_version: 1.9.5
-           
-      # Optional: Terraform fmt check
-      # - name: Terraform fmt
-      #   run: terraform fmt -check
-      #   continue-on-error: true
-      #   working-directory: environments/dev
         
       - name: Terraform Init
         id: init
@@ -77,4 +71,26 @@ jobs:
           tenant-id: 0f7010fd-209e-4344-8457-043ffb37143b
           subscription-id: 1075ec7a-b17a-4f37-bf3f-9d68c4506dc1   
 
-      # ✅ Export Azure OIDC environment variab
+      # ✅ Export Azure OIDC environment variables for Terraform
+      - name: Set Terraform Azure environment variables
+        run: |
+          echo "ARM_CLIENT_ID=ff27bcf6-f60c-4a57-8b01-8eee5de2a9cd" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=0f7010fd-209e-4344-8457-043ffb37143b" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=1075ec7a-b17a-4f37-bf3f-9d68c4506dc1" >> $GITHUB_ENV
+          echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+           terraform_version: 1.9.5
+          
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false  
+        working-directory: environments/dev
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply --auto-approve
+        continue-on-error: true
+        working-directory: environments/dev
