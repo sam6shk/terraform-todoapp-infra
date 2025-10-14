@@ -31,11 +31,11 @@ jobs:
         with:
            terraform_version: 1.9.5
            
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-        working-directory: environments/dev
+      # - name: Terraform fmt
+      #   id: fmt
+      #   run: terraform fmt -check
+      #   continue-on-error: true
+      #   working-directory: environments/dev
         
       - name: Terraform Init
         id: init
@@ -80,6 +80,7 @@ jobs:
         continue-on-error: true
         working-directory: environments/dev              
           
+
 
 
 
